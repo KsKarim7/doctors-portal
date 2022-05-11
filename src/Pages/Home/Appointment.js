@@ -3,12 +3,9 @@ import doctor from '../../assets/images/doctor-small.png'
 import appointment from '../../assets/images/appointment.png'
 import PrimaryButton from '../Shared/PrimaryButton';
 
+
 const Appointment = () => {
-    const reviews = [
-        {
-            _id: 1,
-        }
-    ]
+
     return (
         <div style={
             { background: `url(${appointment})` }
