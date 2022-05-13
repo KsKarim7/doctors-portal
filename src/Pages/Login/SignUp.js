@@ -1,7 +1,7 @@
 import React from 'react';
-import { useCreateUserWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
+import { useCreateUserWithEmailAndPassword, useSignInWithGoogle, useUpdateProfile } from 'react-firebase-hooks/auth';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import auth from '../../firebase.init';
 import Loading from '../Shared/Loading';
 
@@ -15,18 +15,28 @@ const SignUp = () => {
         error,
     ] = useCreateUserWithEmailAndPassword(auth);
 
+    const [updateProfile, updating, updateError] = useUpdateProfile(auth);
+
+    const navigate = useNavigate();
+
     let signUpError;
-    if (error) {
-        signUpError = <p className='text-red-500'> <small>{error.message}</small></p>
+    if (error || gError) {
+        signUpError = <p className='text-red-500'> <small>{error?.message || gError?.message || updateError?.message}</small></p>
     }
 
-    if (loading) {
+    if (loading || gLoading || updating) {
         return <Loading></Loading>
     }
+    if (user || gUser) {
+        console.log(user || gUser)
+    }
 
-    const onSubmit = data => {
-        console.log(data)
-
+    const onSubmit = async data => {
+        // console.log(data)
+        await createUserWithEmailAndPassword(data.email, data.password)
+        await updateProfile({ displayName: data.name });
+        console.log('update done')
+        navigate('/appointment')
     }
     return (
         <div className='flex h-screen justify-center items-center'>
@@ -48,6 +58,10 @@ const SignUp = () => {
                                     },
                                 })}
                             />
+                            <label className="label">
+                                {errors.name?.type === 'required' && <span className='label-text-alt text-red-500'>{errors.name.message}</span>}
+                            </label>
+
                             <label className="label">
                                 <span className="label-text">Email</span>
                             </label>
@@ -93,9 +107,9 @@ const SignUp = () => {
                             </label>
                             {signUpError}
                         </div>
-                        <input className='btn w-full max-w-xs' type="submit" value='Login' />
+                        <input className='btn w-full max-w-xs' type="submit" value='Sign Up' />
                     </form>
-                    <Link to='/signup' className='text-center text-sm mt-1 font-bold'>Existing User? <span className='text-secondary'>Login</span></Link>
+                    <Link to='/login' className='text-center text-sm mt-1 font-bold'>Existing User? <span className='text-secondary'>Login</span></Link>
 
                     <div className='divider'>OR</div>
                     <button
