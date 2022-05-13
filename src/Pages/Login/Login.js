@@ -3,15 +3,16 @@ import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-fireba
 import auth from '../../firebase.init'
 import { useForm } from "react-hook-form";
 import Loading from '../Shared/Loading';
+import { Link } from 'react-router-dom';
 
 const Login = () => {
-    const [signInWithGoogle, gUser, loading, error] = useSignInWithGoogle(auth);
+    const [signInWithGoogle, gUser, gLoading, gError] = useSignInWithGoogle(auth);
     const { register, formState: { errors }, handleSubmit } = useForm();
     const [
         signInWithEmailAndPassword,
         user,
-        gLoading,
-        gError,
+        loading,
+        error,
     ] = useSignInWithEmailAndPassword(auth);
 
     if (loading || gLoading) {
@@ -89,8 +90,9 @@ const Login = () => {
                         </div>
                         <input className='btn w-full max-w-xs' type="submit" value='Login' />
                     </form>
+                    <Link to='/signup' className='text-center text-sm mt-1 font-bold'> New to Doctors Portal? <span className='text-secondary'>Create new account</span></Link>
 
-                    <div className='divider'>or</div>
+                    <div className='divider'>OR</div>
                     <button
                         onClick={() => signInWithGoogle()}
                         className="btn btn-outline">Continue With Google</button>
