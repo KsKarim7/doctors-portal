@@ -23,29 +23,24 @@ const MyAppointments = () => {
                         <tr>
                             <th></th>
                             <th>Name</th>
-                            <th>Job</th>
-                            <th>Favorite Color</th>
+                            <th>Treatment</th>
+                            <th>Date</th>
+                            <th>Time</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th>1</th>
-                            <td>Cy Ganderton</td>
-                            <td>Quality Control Specialist</td>
-                            <td>Blue</td>
-                        </tr>
-                        <tr>
-                            <th>2</th>
-                            <td>Hart Hagerty</td>
-                            <td>Desktop Support Technician</td>
-                            <td>Purple</td>
-                        </tr>
-                        <tr>
-                            <th>3</th>
-                            <td>Brice Swyre</td>
-                            <td>Tax Accountant</td>
-                            <td>Red</td>
-                        </tr>
+                        {
+                            appointments.map((a, index) =>
+                                <tr>
+                                    <th>{index + 1} </th>
+                                    <td>{a.patientName}</td>
+                                    <td>{a.treatment}</td>
+                                    <td>{a.date}</td>
+                                    <td>{a.slot}</td>
+                                </tr>
+                            )
+                        }
+
                     </tbody>
                 </table>
             </div>
