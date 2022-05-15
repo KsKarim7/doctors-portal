@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
+import { useSendPasswordResetEmail } from 'react-firebase-hooks/auth';
 import auth from '../../firebase.init'
 import { useForm } from "react-hook-form";
 import Loading from '../Shared/Loading';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { async } from '@firebase/util';
 
 const Login = () => {
     const [signInWithGoogle, gUser, gLoading, gError] = useSignInWithGoogle(auth);
+    const [sendPasswordResetEmail, sendingEmail] = useSendPasswordResetEmail(auth);
+    const navigate = useNavigate();
+    const [email, setEmail] = useState('')
+    const location = useLocation();
+    const emailRef = useRef('');
     const { register, formState: { errors }, handleSubmit } = useForm();
     const [
         signInWithEmailAndPassword,
@@ -14,8 +21,15 @@ const Login = () => {
         loading,
         error,
     ] = useSignInWithEmailAndPassword(auth);
+    let from = location.state?.from?.pathname || '/';
 
-    if (loading || gLoading) {
+    useEffect(() => {
+        if (user || gUser) {
+            navigate(from, { replace: true })
+        }
+    }, [user, gUser, from, navigate])
+
+    if (loading || gLoading || sendingEmail) {
         return <Loading />
     }
 
@@ -26,14 +40,31 @@ const Login = () => {
     }
 
     if (user || gUser) {
-        console.log(user || gUser)
+        navigate(from, { replace: true })
     }
 
     const onSubmit = data => {
         console.log(data)
         signInWithEmailAndPassword(data.email, data.password)
+
     }
 
+    const handleResetPassword = async () => {
+        const email = emailRef.current.value;
+        console.log(email)
+
+        if (email) {
+            await sendPasswordResetEmail(email);
+            alert('Email Sent')
+        }
+        else {
+            alert('Enter your email first')
+        }
+    }
+    const handleEmail = e => {
+        setEmail(e.target.value)
+
+    }
 
     return (
         <div className='flex h-screen justify-center items-center'>
@@ -46,7 +77,7 @@ const Login = () => {
                             <label className="label">
                                 <span className="label-text">Email</span>
                             </label>
-                            <input type="email"
+                            <input type="email" ref={emailRef} onChange={handleEmail}
                                 className="input input-bordered w-full max-w-xs"
                                 {...register("email", {
                                     required: {
@@ -87,6 +118,7 @@ const Login = () => {
                                 {errors.password?.type === 'minLength' && <span className='label-text-alt text-red-500'>{errors.password.message}</span>}
                             </label>
                             {signInError}
+                            <button onChange={handleResetPassword} className=' ml-2 flex mb-1 text-secondary'>Forgot Password?</button>
                         </div>
                         <input className='btn w-full max-w-xs' type="submit" value='Login' />
                     </form>
@@ -97,8 +129,8 @@ const Login = () => {
                         onClick={() => signInWithGoogle()}
                         className="btn btn-outline">Continue With Google</button>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 
