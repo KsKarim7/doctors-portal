@@ -23,7 +23,7 @@ const SignUp = () => {
     const navigate = useNavigate();
 
     let signUpError;
-    if (error || gError) {
+    if (error || gError || updateError) {
         signUpError = <p className='text-red-500'> <small>{error?.message || gError?.message || updateError?.message}</small></p>
     }
 
@@ -33,6 +33,9 @@ const SignUp = () => {
     if (user || gUser) {
         console.log(user || gUser)
         // navigate('/appointment')
+    }
+    if (token) {
+        navigate('/appointment')
 
     }
 
