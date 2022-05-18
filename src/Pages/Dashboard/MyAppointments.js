@@ -2,7 +2,7 @@ import { signOut } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from 'react-day-picker';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import auth from '../../firebase.init';
 
 const MyAppointments = () => {
@@ -13,7 +13,7 @@ const MyAppointments = () => {
 
     useEffect(() => {
         if (user) {
-            fetch(`https://mighty-spire-44225.herokuapp.com/booking?patient=${user.email}`, {
+            fetch(`http://localhost:5000/booking?patient=${user.email}`, {
                 method: 'GET',
                 headers: {
                     'authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -46,17 +46,25 @@ const MyAppointments = () => {
                             <th>Treatment</th>
                             <th>Date</th>
                             <th>Time</th>
+                            <th>Payment</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
                             appointments?.map((a, index) =>
-                                <tr>
+                                <tr key={a._id}>
                                     <th>{index + 1} </th>
                                     <td>{a.patientName}</td>
                                     <td>{a.treatment}</td>
                                     <td>{a.date}</td>
                                     <td>{a.slot}</td>
+                                    <td>
+                                        {(a.price && !a.paid) && <Link to={`/dashboard/payment/${a._id}`}><button className='btn btn-sm btn-secondary'>Pay </button></Link>}
+                                        {(a.price && a.paid) && <div>
+                                            <p><span className='text-success'>Paid </span></p>
+                                            <p>Transaction id:<span className='text-success'>{a.transactionId} </span></p>
+                                        </div>}
+                                    </td>
                                 </tr>
                             )
                         }
